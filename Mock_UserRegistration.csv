@@ -1,0 +1,4 @@
+email,password,code,message,responsekeys
+eve.holt@reqres.in,,400,Missing password,error
+invalid,pistol,400,Note: Only defined users succeed registration,error
+eve.holt@reqres.in,pistol,200,4,id token

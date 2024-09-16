@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "7a71c4db-7283-4f3c-ab89-63de2c91ba4e",
+		"name": "LyTruong_MockAPI_TestDataDriven",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "6146877",
+		"_collection_link": "https://crimson-equinox-984716.postman.co/workspace/WS1~b1afc951-b1c0-4848-8e41-556200db0756/collection/6146877-7a71c4db-7283-4f3c-ab89-63de2c91ba4e?action=share&source=collection_link&creator=6146877"
+	},
+	"item": [
+		{
+			"name": "MockAPI_User Registration",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Parse the request payload\r",
+							"const requestPayload = JSON.parse(pm.request.body.raw);\r",
+							"const password = pm.iterationData.get(\"password\");\r",
+							"const email = pm.iterationData.get(\"email\");\r",
+							"\r",
+							"pm.environment.set(\"password\", password);\r",
+							"pm.environment.set(\"email\", email);\r",
+							"\r",
+							"// Log the example being used\r",
+							"console.log(`Using password: ${password}`);\r",
+							"\r",
+							"// Determine the endpoint based on conditions\r",
+							"let endpoint;\r",
+							"if (!password) {\r",
+							"    pm.environment.set(\"case\", \"missingpass\");\r",
+							"    endpoint = \"/missingpass\";\r",
+							"} else if (email === \"invalid\") {\r",
+							"    pm.environment.set(\"case\", \"invalidemail\");\r",
+							"    endpoint = \"/invalidemail\";\r",
+							"} else {\r",
+							"    pm.environment.set(\"case\", \"register\");\r",
+							"    endpoint = \"/register\";\r",
+							"}\r",
+							"\r",
+							"// Send the request\r",
+							"pm.sendRequest({\r",
+							"    url: pm.environment.get('mockurl') + endpoint,\r",
+							"    method: 'POST',\r",
+							"    header: {\r",
+							"        'Content-Type': 'application/json'\r",
+							"    },\r",
+							"    body: {\r",
+							"        mode: 'raw',\r",
+							"        raw: JSON.stringify({ email, password })\r",
+							"    }\r",
+							"}, function (err, response) {\r",
+							"    if (err) {\r",
+							"        console.log(err);\r",
+							"    } else {\r",
+							"        console.log(\"Log Response Body: \" + JSON.stringify(response));\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"let statusCode   = pm.response.code;\r",
+							"const password   = pm.variables.get('password');\r",
+							"const code       = pm.variables.get('code');\r",
+							"const message    = pm.variables.get('message');\r",
+							"\r",
+							"\r",
+							"if(statusCode==200)\r",
+							"{\r",
+							"    pm.test(\"Registration successfully with valid email and valid password\", function () {\r",
+							"    pm.response.to.have.jsonBody({\r",
+							"    id: pm.response.json().id, \r",
+							"    token: pm.response.json().token\r",
+							"    });\r",
+							"    });\r",
+							"}\r",
+							"else\r",
+							"{\r",
+							"    if(!password) \r",
+							"    {\r",
+							"                   \r",
+							"        pm.test(\"Registration unsuccessfully with missing password\", function () {  \r",
+							"        pm.response.to.have.status(code);\r",
+							"        pm.expect(pm.response.json().error).to.equal(message);  \r",
+							"        });\r",
+							"    }\r",
+							"    else\r",
+							"    {\r",
+							"        pm.test(\"Registration unsuccessfully with invalid email\", function () {\r",
+							"        pm.response.to.have.status(code);  \r",
+							"        pm.expect(pm.response.json().error).to.equal(message); \r",
+							"        });\r",
+							"\r",
+							"    }   \r",
+							"\r",
+							"}\r",
+							"\r",
+							"// Test to check the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{mockurl}}/{{case}}"
+			},
+			"response": [
+				{
+					"name": "MissingPass",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "{{mockurl}}/missingpass"
+					},
+					"code": 400,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{\r\n  \"error\": \"Missing password\"\r\n}"
+				},
+				{
+					"name": "InvalidEmail",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "{{mockurl}}/invalidemail"
+					},
+					"code": 400,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{\r\n    \"error\": \"Note: Only defined users succeed registration\"\r\n}"
+				},
+				{
+					"name": "RegisterSuccessfully",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "a",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "{{mockurl}}/register"
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\r\n{\r\n   \"id\": {{$randomInt}},\r\n   \"token\": \"{{$randomUUID}}\"\r\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "https://7e1a4ee3-4c30-416f-8a1a-0ea6521c01fe.mock.pstmn.io"
+		}
+	]
+}
