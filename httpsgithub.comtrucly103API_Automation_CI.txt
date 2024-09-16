@@ -1,1 +1,7 @@
 https://github.com/trucly103/API_Automation_CI
+
+newman run "LyTruong_MockAPI_TestDataDriven.postman_collection.json" -e "TestMockAPI.postman_environment.json" -d "Mock_UserRegistration.csv" -r htmlextra --reporter-htmlextra-export index.html
+
+newman run "LyTruong_MockAPI_TestDataDriven.postman_collection.json" -e "TestMockAPI.postman_environment.json" -d "Mock_UserRegistration.csv" -r htmlextra --reporter-htmlextra-export Reports/index.html
+
+newman run "path_to_collection.json" -e "path_to_environment_file" -d "path_to_data_file" -r htmlextra --reporter-htmlextra-export "pạth_to_store_html_report_with_custom_name"
